@@ -63,6 +63,7 @@ services:
       - DATABASE_URL=postgres://${DB_USERNAME}:${DB_PASSWORD}@botpress-db/${DB_DATABASE}
       - PRO_ENABLED=false
       # - EXTERNAL_URL="${BOT_PRESS_EXTERNAL_URL:-http://localhost}:http://localhost"
+      - BPFS_STORAGE=database
       - BP_PRODUCTION=true
       - REDIS_URL=redis://botpress-redis:${BOT_PRESS_REDIS_PORT}?password=
     networks:
