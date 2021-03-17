@@ -1,4 +1,4 @@
-# Template for deploy [Botpress](https://botpress.com) with docker and nginx
+# Template for deploy [Botpress](https://botpress.com) :robot: with docker and nginx
 
 ## Steps to deploy
 
@@ -9,4 +9,13 @@
 
 ## Some considerations
 
-By default, this template will use PostgresSQL with the default database for Metabase settings. For you to work with your data, after installation you need to connect your source data, like MySQL, Postgres, redshift, wherever.
+This project contains:
+
+- BotPress
+- Postgres
+- Redis
+- Nginx
+
+**Important**:
+
+If you want run BotPress in **production mode**, please consider to use external **Redis** and **Postgres**.
