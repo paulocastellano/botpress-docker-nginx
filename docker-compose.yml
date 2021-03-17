@@ -1,0 +1,83 @@
+version: "3"
+services:
+  botpress-db:
+    image: postgres:13.1-alpine
+    restart: always
+    container_name: botpress-db
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - db-postgres:${DB_DATA_DIR}
+    environment:
+      - PGDATA=${DB_DATA_DIR}
+      - POSTGRES_DB=${DB_DATABASE}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    networks:
+      - botpress
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "pg_isready",
+          "-q",
+          "-d",
+          "${DB_DATABASE}",
+          "-U",
+          "${DB_USERNAME}",
+        ]
+
+  botpress-redis:
+    image: "redis:alpine"
+    restart: always
+    container_name: botpress-redis
+    ports:
+      - "${BOT_PRESS_REDIS_PORT:-6379}:6379"
+    volumes:
+      - "db-redis:/data"
+    networks:
+      - botpress
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+
+  botpress-nginx:
+    image: nginx:stable
+    restart: always
+    container_name: botpress-nginx
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - "botpress"
+    networks:
+      - botpress
+    volumes:
+      - "./nginx-service.conf:/etc/nginx/conf.d/default.conf"
+
+  botpress:
+    image: botpress/server:v12_19_0
+    restart: always
+    container_name: botpress
+    environment:
+      - DATABASE=postgres
+      - DATABASE_URL=postgres://${DB_USERNAME}:${DB_PASSWORD}@botpress-db/${DB_DATABASE}
+      - PRO_ENABLED=false
+      # - EXTERNAL_URL="${BOT_PRESS_EXTERNAL_URL:-http://localhost}:http://localhost"
+      - BP_PRODUCTION=true
+      - REDIS_URL=redis://botpress-redis:${BOT_PRESS_REDIS_PORT}?password=
+    networks:
+      - botpress
+    ports:
+      - "${BOT_PRESS_PORT}:3000"
+    depends_on:
+      - botpress-db
+
+networks:
+  botpress:
+    driver: bridge
+
+volumes:
+  db-postgres:
+    driver: local
+  db-redis:
+    driver: local
