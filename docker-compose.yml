@@ -55,7 +55,7 @@ services:
       - "./nginx-service.conf:/etc/nginx/conf.d/default.conf"
 
   botpress:
-    image: botpress/server:v12_19_0
+    image: botpress/server:v12_20_0
     restart: always
     container_name: botpress
     environment:
